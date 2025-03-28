@@ -1,109 +1,153 @@
-# go-build
+# Go Project Setup & Version Management Guide
 
-- create repo in github clone it to local machine
+## Table of Contents
+- [Initial Setup](#initial-setup)
+- [Semantic Versioning](#semantic-versioning)
+- [Tag Management](#tag-management)
+- [GitHub Actions Workflow](#github-actions-workflow)
+- [Best Practices](#best-practices)
+
+## Initial Setup
+
+### 1. Repository Setup
 ```bash
+# Clone repository
 git clone https://github.com/LocaMartin/turtle
+cd turtle
 ```
-- write code `Go` code
 
-- Create a `go.mod` file:
+### 2. Initialize Go Module
 ```bash
 go mod init github.com/LocaMartin/turtle
-```
-
-```bash
 go mod tidy
 ```
-- add workflow file
-  
-```
-.github/workflow/workflow.yaml
-```
-- Make initial push
+
+### 3. Initial Commit
 ```bash
 git add .
+git commit -m "Initial project setup"
+git push origin main
 ```
 
-```bash
-git commit -m "initial push"
-```
+## Semantic Versioning
 
+### Version Format: `vMAJOR.MINOR.PATCH`
+
+| Increment | Description                      | Example    |
+|-----------|----------------------------------|------------|
+| MAJOR     | Breaking API changes             | v2.0.0     |
+| MINOR     | New backward-compatible features | v1.3.0     |
+| PATCH     | Backward-compatible bug fixes    | v1.0.1     |
+
+### Creating a New Release
 ```bash
+# Commit changes
+git add .
+git commit -m "Add feature X"
+
+# Create annotated tag
+git tag -a v1.0.1 -m "Add feature X"
+
+# Push with tags
 git push origin main --tags
 ```
 
-```bash
-# Semantic versioning format (vMAJOR.MINOR.PATCH)
-git tag -a v1.0.0 -m "Initial release version 1.0.0"
-```
+## Tag Management
 
+### View Tags
 ```bash
-# Push code and tags
-git push origin main --tags
-```
-- Verify Tags
-```
-# List local tags
+# Local tags
 git tag
 
-# List remote tags
+# Remote tags
 git ls-remote --tags origin
 ```
 
-**Update Process for New Versions**
-- Commit code changes
-- Create new tag:
+### Delete Tags
 ```bash
-git tag -a v1.0.1 -m "Add file validation feature"
-```
-- Push with tags
-```
-git push origin main --tags
-```
-- Delete a Tag (if needed)
-```bash
-# Delete local tag
+# Local delete
 git tag -d v1.0.0
 
-# Delete remote tag
+# Remote delete
 git push origin --delete v1.0.0
 ```
 
-**Semantic Versioning Format:**
+## GitHub Actions Workflow
 
-- v<MAJOR>.<MINOR>.<PATCH>
-Example: **`v1.2.3`**
+Create `.github/workflows/go.yml`:
+```yaml
+name: Go CI/CD
 
-    - MAJOR: Breaking changes
+on:
+  push:
+    tags: [v*]
+  pull_request:
+    branches: [main]
 
-    - MINOR: New features (backwards compatible)
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.21
+          
+      - name: Build
+        run: go build -v ./...
+        
+      - name: Test
+        run: go test -v ./...
+        
+      - name: Lint
+        run: |
+          go install golang.org/x/lint/golint@latest
+          golint ./...
+```
 
-    - PATCH: Bug fixes
+### Workflow Use Cases
+| Scenario                  | Automation Benefit               |
+|---------------------------|-----------------------------------|
+| Continuous Integration    | Run tests on every PR/push       |
+| Cross-platform Builds     | Build for multiple OS targets    |
+| Release Management        | Auto-create GitHub releases      |
+| Code Quality              | Enforce linting/formatting       |
 
-- Annotated Tags (-a flag):
+## Best Practices
 
-  -  Store author info
+1. **Always use annotated tags**  
+   ```bash
+   git tag -a v1.0.0 -m "Message"
+   ```
 
-  -  Have timestamp
+2. **Push tags immediately** after creation  
+   ```bash
+   git push --tags
+   ```
 
-  -  Recommended for releases
+3. **Maintain semantic versioning** strictly  
+   - Increment MAJOR for breaking changes
+   - Increment MINOR for new features
+   - Increment PATCH for bug fixes
 
-- When You Need GitHub Actions Workflow:
+4. **Keep dependencies updated**  
+   ```bash
+   go mod tidy
+   ```
 
-  - Automated Testing
-  - Run go test on every push/pull request
-  - Cross-platform Builds
-  - Compile binaries for Windows/Linux/macOS automatically
-  - Release Automation
-  - Create GitHub releases when you push tags
-  - Code Quality Checks
-  - Enforce formatting (gofmt), linting (golint), or security scans
-  - Dependency Updates
-  - Automate Go module dependency management
+5. **Write meaningful commit messages**  
+   Bad: "Fix stuff"  
+   Good: "Fix file validation edge case"
 
-- When You Don't Need It:
+6. **Use workflow triggers wisely**  
+   ```yaml
+   on:
+     push:
+       tags: [v*]  # Trigger on version tags
+     pull_request:
+       branches: [main]
+   ```
 
-  - Small personal projects
-  - Early development stages
-  - Manual testing/building is acceptable
-  - No multi-platform distribution needed
+> **Note:** For small projects or prototypes, you can simplify workflows, but maintaining version discipline from the start helps in long-term maintenance.
