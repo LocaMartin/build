@@ -88,34 +88,22 @@ Example: **`v1.2.3`**
 
   -  Recommended for releases
 
-When You Need GitHub Actions Workflow:
+- When You Need GitHub Actions Workflow:
 
-    Automated Testing
+Automated Testing
+Run go test on every push/pull request
+Cross-platform Builds
+Compile binaries for Windows/Linux/macOS automatically
+Release Automation
+Create GitHub releases when you push tags
+Code Quality Checks
+Enforce formatting (gofmt), linting (golint), or security scans
+Dependency Updates
+Automate Go module dependency management
 
-        Run go test on every push/pull request
+- When You Don't Need It:
 
-    Cross-platform Builds
-
-        Compile binaries for Windows/Linux/macOS automatically
-
-    Release Automation
-
-        Create GitHub releases when you push tags
-
-    Code Quality Checks
-
-        Enforce formatting (gofmt), linting (golint), or security scans
-
-    Dependency Updates
-
-        Automate Go module dependency management
-
-When You Don't Need It:
-
-    Small personal projects
-
-    Early development stages
-
-    Manual testing/building is acceptable
-
-    No multi-platform distribution needed
+Small personal projects
+Early development stages
+Manual testing/building is acceptable
+No multi-platform distribution needed
